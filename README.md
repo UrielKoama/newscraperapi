@@ -1,0 +1,4 @@
+# newscraperapi
+API is a web service that provides access to news articles related to the field of artificial intelligence from around the world
+
+The Artificial Intelligence News API is a web service that provides access to news articles related to the field of artificial intelligence from around the world. This API can be used by developers and researchers who are interested in staying up-to-date with the latest advancements, research and trends in the field of AI.  The API is built using Node.js and utilizes the News API service to retrieve news articles. Developers can make GET requests to the API endpoint to retrieve the latest news articles on artificial intelligence. The response will be in the JSON format and will contain an array of news articles with relevant information such as article title and URL.
