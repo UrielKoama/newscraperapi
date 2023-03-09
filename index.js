@@ -1,9 +1,9 @@
-// const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
-let PORT = process.env.PORT;
-if (PORT == null || PORT == '') {
+/*let PORT = process.env.PORT;
+if (PORT == null || PORT === '') {
     PORT = 5000;
-}
+}*/
 // app.listen(PORT);
 const express = require('express');
 const app = express();
@@ -34,11 +34,7 @@ const websites = [
         address: 'https://www.telegraph.co.uk/artificial-intelligence/',
         base: 'https://www.telegraph.co.uk'
     }*/
-    /*{
-        name: 'extremetech',
-        address: 'https://www.extremetech.com/tag/artificial-intelligence',
-        base: ''
-    }*/
+
 ];
 const articles = [];
 
