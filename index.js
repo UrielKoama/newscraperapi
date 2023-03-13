@@ -56,10 +56,10 @@ websites.forEach(element => {
 })
 
 app.get('/', (req, res) => {
-    res.json('Welcome to The Artificial intelligence News API')});
+    res.send('Welcome to The Artificial intelligence News API')});
 
 app.get('/ai-news', (req, res) => { //new link
-    res.json(articles);
+    res.send(articles);
 });
 
 app.get('/ai-news/:paperId',(req, res) => {
@@ -85,8 +85,9 @@ app.get('/ai-news/:paperId',(req, res) => {
                     source: paperId
                 });
             });
-            res.json(posts);
+            res.send(posts);
         }).catch((err) => console.log(err));
 });
 
+module.exports = app
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
