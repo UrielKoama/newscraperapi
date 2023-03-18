@@ -27,14 +27,34 @@ const websites = [
         base: ''
     },
     {
-        name: 'aintelligence', url: 'https://www.artificialintelligence-news.com/', base: ''
+        name: 'aintelligence',
+        url: 'https://www.artificialintelligence-news.com/', base: ''
     },
-    /*{
-        name: 'telegraph',
-        address: 'https://www.telegraph.co.uk/artificial-intelligence/',
-        base: 'https://www.telegraph.co.uk'
-    }*/
-
+    {
+        name: 'medium',
+        url: 'https://medium.com/tag/artificial-intelligence/latest',
+        base: 'https://medium.com'
+    },
+    {
+        name: 'wired',
+        url: 'https://www.wired.com/',
+        base: 'https://www.wired.com'
+    },
+    {
+        name: 'techcrunch',
+        url: 'https://techcrunch.com/category/artificial-intelligence/',
+        base: ''
+    },
+    {
+        name: 'openaiblog',
+        url: 'https://openai.com/blog',
+        base: 'https://openai.com'
+    },
+    {
+        name: 'nytimes',
+        url: 'https://www.nytimes.com/section/technology',
+        base: ''
+    }
 ];
 const articles = [];
 
@@ -42,7 +62,6 @@ websites.forEach(element => {
     axios.get(element.url).then((response) => {
         const html = response.data
         const $ = cheerio.load(html)
-
         $('a:contains("AI")',html).each(function() {
             const title = $(this).text()
             const link = $(this).attr('href')
@@ -56,37 +75,67 @@ websites.forEach(element => {
 })
 
 app.get('/', (req, res) => {
-    res.send('Welcome to The Artificial intelligence News API')});
-
-app.get('/ai-news', (req, res) => { //new link
-    res.send(articles);
+    res.send('Welcome to The Artificial Intelligence News API')
 });
 
-app.get('/ai-news/:paperId',(req, res) => {
+app.get('/ai-news', async (req, res) => {
+    try { // to ensure that all requests have completed before serving the results
+        const promises = websites.map(async (site) => {
+            const response = await axios.get(site.url);
+            const html = response.data;
+            const $ = cheerio.load(html);
+            $('a:contains("AI")', html).each(function () {
+                const title = $(this).text();
+                const link = $(this).attr('href');
+                articles.push({
+                    title,
+                    link: site.base + link,
+                    source: site.name,
+                });
+            });
+        });
+        await Promise.all(promises);
+        res.send(articles);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/ai-news/:paperId', (req, res) => {
     const paperId = req.params.paperId;
-    //console.log(paperId);
+    const site = websites.find((site) => site.name === paperId);
 
-    const paperAddress = websites.filter(element => element.name === paperId)[0].url;
-    const paperBase= websites.filter(element => element.name === paperId)[0].base;
-    // console.log(paperAddress);
+    if (!site) {
+        res.status(404).send(`Website "${paperId}" not found`);
+        return;
+    }
 
-    axios.get(paperAddress)
+    const paperAddress = site.url;
+    const paperBase = site.base;
+
+    axios
+        .get(paperAddress)
         .then((response) => {
             const html = response.data;
             const $ = cheerio.load(html);
             const posts = [];
 
-            $('a:contains("AI")',html).each(function() {
-                const title = $(this).text()
+            $('a:contains("AI")', html).each(function () {
+                const title = $(this).text();
                 const url = $(this).attr('href');
                 posts.push({
                     title,
                     url: paperBase + url,
-                    source: paperId
+                    source: paperId,
                 });
             });
             res.send(posts);
-        }).catch((err) => console.log(err));
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Internal Server Error');
+        });
 });
 
 module.exports = app
